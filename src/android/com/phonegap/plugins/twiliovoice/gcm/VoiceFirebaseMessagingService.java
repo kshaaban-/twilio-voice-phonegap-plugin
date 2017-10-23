@@ -1,7 +1,8 @@
-package com.phonegap.plugins.twiliovoice.gcm;
+package com.phonegap.plugins.twiliovoice.fcm;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -16,13 +17,22 @@ import android.service.notification.StatusBarNotification;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import com.twilio.voice.CallInvite;
 
-import com.google.android.gms.gcm.GcmListenerService;
+import com.google.firebase.messaging.FirebaseMessagingService;
+import com.google.firebase.messaging.RemoteMessage;
+import com.twilio.voice.CallInvite;
+import com.twilio.voice.MessageException;
+import com.twilio.voice.MessageListener;
+import com.twilio.voice.Voice;
+import com.twilio.voice.quickstart.R;
+import com.twilio.voice.quickstart.SoundPoolManager;
+import com.twilio.voice.quickstart.VoiceActivity;
+
 
 import com.phonegap.plugins.twiliovoice.TwilioVoicePlugin;
 
 import java.util.List;
+import java.util.Map;
 
 import static android.R.attr.data;
 
@@ -31,7 +41,7 @@ import static android.R.attr.data;
  * From Twilio
  */
 
-public class VoiceGCMListenerService extends GcmListenerService {
+public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
 
     private static final String TAG = TwilioVoicePlugin.TAG;
 
@@ -40,6 +50,7 @@ public class VoiceGCMListenerService extends GcmListenerService {
      */
     private static final String NOTIFICATION_ID_KEY = "NOTIFICATION_ID";
     private static final String CALL_SID_KEY = "CALL_SID";
+    private static final String VOICE_CHANNEL = "default";
 
     private NotificationManager notificationManager;
 
@@ -50,55 +61,27 @@ public class VoiceGCMListenerService extends GcmListenerService {
     }
 
     @Override
-    public void onMessageReceived(String from, Bundle bundle) {
-        Log.d(TAG, "onMessageReceived " + from);
-
+    public void onMessageReceived(RemoteMessage remoteMessage) {
         Log.d(TAG, "Received onMessageReceived()");
-        Log.d(TAG, "From: " + from);
-        Log.d(TAG, "Bundle data: " + bundle.toString());
+        Log.d(TAG, "Bundle data: " + remoteMessage.getData());
+        Log.d(TAG, "From: " + remoteMessage.getFrom());
 
-        if (CallInvite.isValidMessage(bundle)) {
-            /*
-             * Generate a unique notification id using the system time
-             */
-            int notificationId = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
-            /*
-             * Create an CallInvite from the bundle
-             */
-            CallInvite callInvite = CallInvite.create(bundle);
-            if (callInvite != null) {
-                sendCallInviteToPlugin(callInvite, notificationId);
-                showNotification(callInvite, notificationId);
-            } else {
-                Log.e(TAG, "Error: CallInvite was not able to be created from Bundle");
-            }
-        } else {
-            Log.d(TAG, "Invalid CallInvite Message");
-
-            // from http://stackoverflow.com/a/32066691
-            Intent passThroughIntent = new Intent();
-            bundle.putString("from", from);
-            passThroughIntent.putExtras(bundle);
-            passThroughIntent.setAction("com.google.android.c2dm.intent.RECEIVE");
-            passThroughIntent.setComponent(null);
-
-            // from https://github.com/intercom/intercom-cordova/pull/166/files
-            List<ResolveInfo> services = getPackageManager().queryIntentServices(passThroughIntent, 0);
-            for(ResolveInfo info : services) {
-                try {
-                    Class serviceClass = Class.forName(info.serviceInfo.name);
-                    if (serviceClass == this.getClass()) {
-                        continue;
-                    }
-
-                    Context applicationContext = getApplicationContext();
-                    passThroughIntent.setClass(applicationContext, serviceClass);
-                    applicationContext.startService(passThroughIntent);
-                    return;
-                } catch (ClassNotFoundException e) {
-                    // Class not found. Try the next service
+        // Check if message contains a data payload.
+        if (remoteMessage.getData().size() > 0) {
+            Map<String, String> data = remoteMessage.getData();
+            final int notificationId = (int) System.currentTimeMillis();
+            Voice.handleMessage(this, data, new MessageListener() {
+                @Override
+                public void onCallInvite(CallInvite callInvite) {
+                    VoiceFirebaseMessagingService.this.notify(callInvite, notificationId);
+                    VoiceFirebaseMessagingService.this.sendCallInviteToActivity(callInvite, notificationId);
                 }
-            }
+
+                @Override
+                public void onError(MessageException messageException) {
+                    Log.e(TAG, messageException.getLocalizedMessage());
+                }
+            });
         }
     }
 
@@ -108,25 +91,25 @@ public class VoiceGCMListenerService extends GcmListenerService {
     @TargetApi(Build.VERSION_CODES.KITKAT_WATCH)
     private void showNotification(CallInvite callInvite, final int notificationId) {
         String callSid = callInvite.getCallSid();
+        Notification notification = null;
 
         Log.d(TAG, "showNotification()");
 
-        if (!callInvite.isCancelled()) {
+        if (callInvite.getState() == CallInvite.State.PENDING) {
             /*
              * Create a PendingIntent to specify the action when the notification is
              * selected in the notification drawer
              */
 
             //start up the launch activity for the app (Cordova)
-            Intent intent = getPackageManager().getLaunchIntentForPackage(getPackageName());
+            Intent intent = new Intent(this, VoiceActivity.class);
             intent.setAction(TwilioVoicePlugin.ACTION_INCOMING_CALL);
-            intent.putExtra(TwilioVoicePlugin.INCOMING_CALL_INVITE, callInvite);
             intent.putExtra(TwilioVoicePlugin.INCOMING_CALL_NOTIFICATION_ID, notificationId);
+            intent.putExtra(TwilioVoicePlugin.INCOMING_CALL_INVITE, callInvite);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, notificationId, intent, PendingIntent.FLAG_ONE_SHOT);
 
             Log.d(TAG, "showNotification(): Created pending intent");
-
 
             /*
              * Pass the notification id and call sid to use as an identifier to cancel the
@@ -186,6 +169,7 @@ public class VoiceGCMListenerService extends GcmListenerService {
 
             Log.d(TAG, "showNotification(): show notification");
         } else {
+            SoundPoolManager.getInstance(this).stopRinging();
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                 /*
                  * If the incoming call was cancelled then remove the notification by matching
@@ -198,6 +182,8 @@ public class VoiceGCMListenerService extends GcmListenerService {
                     String notificationCallSid = extras.getString(CALL_SID_KEY);
                     if (callSid.equals(notificationCallSid)) {
                         notificationManager.cancel(extras.getInt(NOTIFICATION_ID_KEY));
+                    } else {
+                        sendCallInviteToPlugin(callInvite, notificationId);
                     }
                 }
             } else {
