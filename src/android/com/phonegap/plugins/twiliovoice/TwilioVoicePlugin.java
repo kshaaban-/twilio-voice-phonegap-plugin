@@ -687,7 +687,7 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 			return "accepted";
 		} else if (state == CallInvite.State.REJECTED) {
 			return "rejected";
-		} else if (state == CallInvite.State.CANCELLED) {
+		} else if (state == CallInvite.State.CANCELED) {
 			return "cancelled";
 		}
 
