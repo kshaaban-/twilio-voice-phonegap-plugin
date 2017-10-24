@@ -62,7 +62,7 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 
 	// Twilio Voice Member Variables
 	private Call mCall;
-	private CallInvite mCallInvite;https://github.com/twilio/voice-quickstart-android/blob/master/app/src/main/java/com/twilio/voice/quickstart/VoiceActivity.java
+	private CallInvite mCallInvite;
 
 	// Access Token
 	private String mAccessToken;
