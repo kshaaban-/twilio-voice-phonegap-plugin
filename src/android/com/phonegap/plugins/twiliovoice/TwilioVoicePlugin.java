@@ -24,7 +24,7 @@ import com.twilio.voice.CallInvite;
 import com.twilio.voice.CallState;
 import com.twilio.voice.RegistrationException;
 import com.twilio.voice.RegistrationListener;
-import com.twilio.voice.VoiceClient;
+import com.twilio.voice.Voice;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
