@@ -31,7 +31,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Chronometer;
 
-
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.phonegap.plugins.twiliovoice.gcm.GCMRegistrationService;
 import com.twilio.voice.Call;
@@ -106,7 +105,7 @@ public class TwilioVoicePlugin extends CordovaPlugin {
     public static final String ACTION_INCOMING_CALL = "ACTION_INCOMING_CALL";
 	public static final String ACTION_SET_FCM_TOKEN = "SET_FCM_TOKEN";
 
-    // public static final String KEY_FCM_TOKEN = "FCM_TOKEN";
+    public static final String KEY_FCM_TOKEN = "FCM_TOKEN";
 
 
 	private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
