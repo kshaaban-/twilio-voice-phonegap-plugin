@@ -668,7 +668,7 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 				mCall = null;
 				javascriptErrorback(exception.getErrorCode(), exception.getMessage(), mInitCallbackContext);
 			}
-		}
+		};
 	
 	};
 
