@@ -62,7 +62,7 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 
 	// Twilio Voice Member Variables
 	private Call mCall;
-	private CallInvite mCallInvite;
+	private CallInvite mCallInvite;https://github.com/twilio/voice-quickstart-android/blob/master/app/src/main/java/com/twilio/voice/quickstart/VoiceActivity.java
 
 	// Access Token
 	private String mAccessToken;
@@ -297,7 +297,7 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 				if (mCall != null && mCall.getState().equals(CallState.CONNECTED)) {
 					mCall.disconnect();
 				}
-				mCall = VoiceClient.call(cordova.getActivity(),accessToken, map, mCallListener);
+				mCall = Voice.call(cordova.getActivity(),accessToken, map, mCallListener);
 				Log.d(TAG, "Placing call with params: " + map.toString());
 			}
 		});
@@ -588,7 +588,7 @@ public class TwilioVoicePlugin extends CordovaPlugin {
      * Register your GCM token with Twilio to enable receiving incoming calls via GCM
      */
     private void register() {
-        VoiceClient.register(cordova.getActivity().getApplicationContext(), mAccessToken, mGCMToken, mRegistrationListener);
+        Voice.register(cordova.getActivity().getApplicationContext(), mAccessToken, mGCMToken, mRegistrationListener);
     }
 
     // Process incoming call invites
