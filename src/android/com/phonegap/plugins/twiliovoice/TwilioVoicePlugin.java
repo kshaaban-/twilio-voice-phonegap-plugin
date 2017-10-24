@@ -637,36 +637,39 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 	};
 
 	// Twilio Voice Call Listener
-	private Call.Listener mCallListener = new Call.Listener() {
-		@Override
-		public void onConnected(Call call) {
-			mCall = call;
+	private Call.Listener mCallListener() {
+		return new Call.Listener() {
+			@Override
+			public void onConnected(Call call) {
+				mCall = call;
 
-			JSONObject callProperties = new JSONObject();
-			try {
-				callProperties.putOpt("from", call.getFrom());
-				callProperties.putOpt("to", call.getTo());
-				callProperties.putOpt("callSid", call.getCallSid());
-				callProperties.putOpt("isMuted", call.isMuted());
-				String callState = getCallState(call.getState());
-				callProperties.putOpt("state",callState);
-			} catch (JSONException e) {
-				Log.e(TAG,e.getMessage(),e);
+				JSONObject callProperties = new JSONObject();
+				try {
+					callProperties.putOpt("from", call.getFrom());
+					callProperties.putOpt("to", call.getTo());
+					// callProperties.putOpt("callSid", call.getCallSid());
+					callProperties.putOpt("isMuted", call.isMuted());
+					String callState = getCallState(call.getState());
+					callProperties.putOpt("state",callState);
+				} catch (JSONException e) {
+					Log.e(TAG,e.getMessage(),e);
+				}
+				javascriptCallback("oncalldidconnect",callProperties,mInitCallbackContext);
 			}
-			javascriptCallback("oncalldidconnect",callProperties,mInitCallbackContext);
-		}
 
-		@Override
-		public void onDisconnected(Call call) {
-			mCall = null;
-			javascriptCallback("oncalldiddisconnect",mInitCallbackContext);
-		}
+			@Override
+			public void onDisconnected(Call call) {
+				mCall = null;
+				javascriptCallback("oncalldiddisconnect",mInitCallbackContext);
+			}
 
-		@Override
-		public void onDisconnected(Call call, CallException exception) {
-			mCall = null;
-			javascriptErrorback(exception.getErrorCode(), exception.getMessage(), mInitCallbackContext);
+			@Override
+			public void onDisconnected(Call call, CallException exception) {
+				mCall = null;
+				javascriptErrorback(exception.getErrorCode(), exception.getMessage(), mInitCallbackContext);
+			}
 		}
+	
 	};
 
 	private String getCallState(CallState callState) {
