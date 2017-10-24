@@ -6,17 +6,33 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
+import android.media.AudioFocusRequest;
+import android.media.AudioAttributes;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
+import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Chronometer;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
+
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.phonegap.plugins.twiliovoice.gcm.GCMRegistrationService;
 import com.twilio.voice.Call;
 import com.twilio.voice.CallException;
@@ -24,7 +40,7 @@ import com.twilio.voice.CallInvite;
 import com.twilio.voice.CallState;
 import com.twilio.voice.RegistrationException;
 import com.twilio.voice.RegistrationListener;
-import com.twilio.voice.VoiceClient;
+import com.twilio.voice.Voice;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
@@ -67,8 +83,8 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 	// Access Token
 	private String mAccessToken;
 
-    // GCM Token
-    private String mGCMToken;
+    // FCM Token
+    private String mFCMToken;
 
 	// Has the plugin been initialized
 	private boolean mInitialized = false;
@@ -85,27 +101,27 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 
 
     // Constants for Intents and Broadcast Receivers
-    public static final String ACTION_SET_GCM_TOKEN = "SET_GCM_TOKEN";
     public static final String INCOMING_CALL_INVITE = "INCOMING_CALL_INVITE";
     public static final String INCOMING_CALL_NOTIFICATION_ID = "INCOMING_CALL_NOTIFICATION_ID";
-    public static final String ACTION_INCOMING_CALL = "INCOMING_CALL";
+    public static final String ACTION_INCOMING_CALL = "ACTION_INCOMING_CALL";
+	public static final String ACTION_SET_FCM_TOKEN = "SET_FCM_TOKEN";
 
-    public static final String KEY_GCM_TOKEN = "GCM_TOKEN";
+    // public static final String KEY_FCM_TOKEN = "FCM_TOKEN";
 
 
 	private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if (action.equals(ACTION_SET_GCM_TOKEN)) {
-                String gcmToken = intent.getStringExtra(KEY_GCM_TOKEN);
-                Log.i(TAG, "GCM Token : " + gcmToken);
-                mGCMToken = gcmToken;
-                if(gcmToken == null) {
-                    javascriptErrorback(0, "Did not receive GCM Token - unable to receive calls", mInitCallbackContext);
+            if (action.equals(ACTION_SET_FCM_TOKEN)) {
+                String fcmToken = intent.getStringExtra(KEY_FCM_TOKEN);
+                Log.i(TAG, "FCM Token : " + fcmToken);
+                mFCMToken = fcmToken;
+                if(fcmToken == null) {
+                    javascriptErrorback(0, "Did not receive FCM Token - unable to receive calls", mInitCallbackContext);
                 }
                 //callActionFab.show();
-                if (mGCMToken != null) {
+                if (mFCMToken != null) {
                     register();
                 }
             } else if (action.equals(ACTION_INCOMING_CALL)) {
@@ -171,7 +187,7 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 			mInitCallbackContext = callbackContext;
 
             IntentFilter intentFilter = new IntentFilter();
-            intentFilter.addAction(ACTION_SET_GCM_TOKEN);
+            intentFilter.addAction(ACTION_SET_FCM_TOKEN);
             intentFilter.addAction(ACTION_INCOMING_CALL);
             LocalBroadcastManager lbm = LocalBroadcastManager.getInstance(cordova.getActivity());
             lbm.registerReceiver(mBroadcastReceiver, intentFilter);
@@ -179,7 +195,7 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 
 			if(cordova.hasPermission(RECORD_AUDIO))
 			{
-				startGCMRegistration();
+				startFCMRegistration();
 			}
 			else
 			{
@@ -579,16 +595,16 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 		switch(requestCode)
 		{
 			case RECORD_AUDIO_REQ_CODE:
-                startGCMRegistration();
+                startFCMRegistration();
 				break;
 		}
 	}
 
     /*
-     * Register your GCM token with Twilio to enable receiving incoming calls via GCM
+     * Register your FCM token with Twilio to enable receiving incoming calls via FCM
      */
     private void register() {
-        VoiceClient.register(cordova.getActivity().getApplicationContext(), mAccessToken, mGCMToken, mRegistrationListener);
+        VoiceClient.register(cordova.getActivity().getApplicationContext(), mAccessToken, mFCMToken, mRegistrationListener);
     }
 
     // Process incoming call invites
@@ -626,12 +642,12 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 	// Twilio Voice Registration Listener
 	private RegistrationListener mRegistrationListener = new RegistrationListener() {
 		@Override
-		public void onRegistered(String accessToken, String gcmToken) {
+		public void onRegistered(String accessToken, String fcmToken) {
             Log.d(TAG, "Registered Voice Client");
 		}
 
 		@Override
-		public void onError(RegistrationException exception, String accessToken, String gcmToken) {
+		public void onError(RegistrationException exception, String accessToken, String fcmToken) {
             Log.e(TAG, "Error registering Voice Client: " + exception.getMessage(), exception);
 		}
 	};
@@ -695,11 +711,11 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 	}
 
 
-    private void startGCMRegistration() {
-        Log.d(TAG, "Starting GCM Registration");
+    private void startFCMRegistration() {
+        Log.d(TAG, "Starting FCM Registration");
         if (checkPlayServices()) {
             Log.d(TAG, "Found Google Play Services");
-            Intent intent = new Intent(cordova.getActivity(), GCMRegistrationService.class);
+            Intent intent = new Intent(cordova.getActivity(), FCMRegistrationService.class);
             cordova.getActivity().startService(intent);
         }
     }
