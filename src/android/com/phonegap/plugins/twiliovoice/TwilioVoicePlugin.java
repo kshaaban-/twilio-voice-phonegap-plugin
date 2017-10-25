@@ -637,39 +637,36 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 	};
 
 	// Twilio Voice Call Listener
-	private Call.Listener mCallListener() {
-		return new Call.Listener() {
-			@Override
-			public void onConnected(Call call) {
-				mCall = call;
+	private Call.Listener mCallListener = new Call.Listener() {
+		@Override
+		public void onConnectFailure(Call call, CallException exception) {
+			mCall = null;
+			javascriptErrorback(exception.getErrorCode(), exception.getMessage(), mInitCallbackContext);
+		}
 
-				JSONObject callProperties = new JSONObject();
-				try {
-					callProperties.putOpt("from", call.getFrom());
-					callProperties.putOpt("to", call.getTo());
-					// callProperties.putOpt("callSid", call.getCallSid());
-					callProperties.putOpt("isMuted", call.isMuted());
-					String callState = getCallState(call.getState());
-					callProperties.putOpt("state",callState);
-				} catch (JSONException e) {
-					Log.e(TAG,e.getMessage(),e);
-				}
-				javascriptCallback("oncalldidconnect",callProperties,mInitCallbackContext);
-			}
+		@Override
+		public void onConnected(Call call) {
+			mCall = call;
 
-			@Override
-			public void onDisconnected(Call call) {
-				mCall = null;
-				javascriptCallback("oncalldiddisconnect",mInitCallbackContext);
+			JSONObject callProperties = new JSONObject();
+			try {
+				callProperties.putOpt("from", call.getFrom());
+				callProperties.putOpt("to", call.getTo());
+				// callProperties.putOpt("callSid", call.getCallSid());
+				callProperties.putOpt("isMuted", call.isMuted());
+				String callState = getCallState(call.getState());
+				callProperties.putOpt("state",callState);
+			} catch (JSONException e) {
+				Log.e(TAG,e.getMessage(),e);
 			}
+			javascriptCallback("oncalldidconnect",callProperties,mInitCallbackContext);
+		}
 
-			@Override
-			public void onDisconnected(Call call, CallException exception) {
-				mCall = null;
-				javascriptErrorback(exception.getErrorCode(), exception.getMessage(), mInitCallbackContext);
-			}
-		};
-	
+		@Override
+		public void onDisconnected(Call call, CallException error) {
+			mCall = null;
+			javascriptCallback("oncalldiddisconnect",mInitCallbackContext);
+		}
 	};
 
 	private String getCallState(CallState callState) {
@@ -690,7 +687,7 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 			return "accepted";
 		} else if (state == CallInvite.State.REJECTED) {
 			return "rejected";
-		} else if (state == CallInvite.State.CANCELED) {
+		} else if (state == CallInvite.State.CANCELLED) {
 			return "cancelled";
 		}
 
