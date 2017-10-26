@@ -112,7 +112,7 @@ public class VoiceGCMListenerService extends GcmListenerService {
 
         Log.d(TAG, "showNotification()");
 
-        if (state != CallInvite.State.CANCELED) {
+        if (state != null) {
             /*
              * Create a PendingIntent to specify the action when the notification is
              * selected in the notification drawer
@@ -221,6 +221,7 @@ public class VoiceGCMListenerService extends GcmListenerService {
      * Send the IncomingCallMessage to the Plugin
      */
     private void sendCallInviteToPlugin(CallInvite incomingCallMessage, int notificationId) {
+
         Intent intent = new Intent(TwilioVoicePlugin.ACTION_INCOMING_CALL);
         intent.putExtra(TwilioVoicePlugin.INCOMING_CALL_INVITE, incomingCallMessage);
         intent.putExtra(TwilioVoicePlugin.INCOMING_CALL_NOTIFICATION_ID, notificationId);
