@@ -227,12 +227,12 @@ public class VoiceGCMListenerService extends GcmListenerService {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
-    private String getCallState(CallState callState) {
-		if (callState == CallState.CONNECTED) {
+    private String getCallState(CallInvite callState) {
+		if (callState == CallInvite.CONNECTED) {
 			return "connected";
-		} else if (callState == CallState.CONNECTING) {
+		} else if (callState == CallInvite.CONNECTING) {
 			return "connecting";
-		} else if (callState == CallState.DISCONNECTED) {
+		} else if (callState == CallInvite.DISCONNECTED) {
 			return "disconnected";
 		}
 		return null;
