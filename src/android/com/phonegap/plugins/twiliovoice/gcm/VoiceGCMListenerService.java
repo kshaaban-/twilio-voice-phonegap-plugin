@@ -108,7 +108,7 @@ public class VoiceGCMListenerService extends GcmListenerService {
     @TargetApi(Build.VERSION_CODES.KITKAT_WATCH)
     private void showNotification(CallInvite callInvite, final int notificationId) {
         String callSid = callInvite.getCallSid();
-        String callState = getCallState(call.getState());
+        String callState = getCallState(callInvite.getState());
 
         Log.d(TAG, "showNotification()");
         if (callState != null) {
