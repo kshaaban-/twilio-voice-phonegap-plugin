@@ -110,7 +110,7 @@ public class VoiceGCMListenerService extends GcmListenerService {
         String callSid = callInvite.getCallSid();
 
         Log.d(TAG, "showNotification()");
-        if (callInvite.getState == CallInvite.State.PENDING) {
+        if (callInvite.getState() == CallInvite.State.PENDING) {
             /*
              * Create a PendingIntent to specify the action when the notification is
              * selected in the notification drawer
