@@ -108,11 +108,10 @@ public class VoiceGCMListenerService extends GcmListenerService {
     @TargetApi(Build.VERSION_CODES.KITKAT_WATCH)
     private void showNotification(CallInvite callInvite, final int notificationId) {
         String callSid = callInvite.getCallSid();
-        String state = callInvite.State;
 
         Log.d(TAG, "showNotification()");
 
-        if (state != null) {
+        if (callInvite.State != null) {
             /*
              * Create a PendingIntent to specify the action when the notification is
              * selected in the notification drawer
