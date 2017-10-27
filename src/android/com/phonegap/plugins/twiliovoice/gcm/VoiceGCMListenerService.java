@@ -88,32 +88,32 @@ public class VoiceGCMListenerService extends GcmListenerService {
             @Override
             public void onError(MessageException messageException) {
                 Log.e(TAG, messageException.getLocalizedMessage());
-                Log.d(TAG, "Invalid CallInvite Message");
+                // Log.d(TAG, "Invalid CallInvite Message");
 
-                // from http://stackoverflow.com/a/32066691
-                Intent passThroughIntent = new Intent();
-                bundle.putString("from", from);
-                passThroughIntent.putExtras(bundle);
-                passThroughIntent.setAction("com.google.android.c2dm.intent.RECEIVE");
-                passThroughIntent.setComponent(null);
+                // // from http://stackoverflow.com/a/32066691
+                // Intent passThroughIntent = new Intent();
+                // bundle.putString("from", from);
+                // passThroughIntent.putExtras(bundle);
+                // passThroughIntent.setAction("com.google.android.c2dm.intent.RECEIVE");
+                // passThroughIntent.setComponent(null);
 
-                // from https://github.com/intercom/intercom-cordova/pull/166/files
-                List<ResolveInfo> services = getPackageManager().queryIntentServices(passThroughIntent, 0);
-                for(ResolveInfo info : services) {
-                    try {
-                        Class serviceClass = Class.forName(info.serviceInfo.name);
-                        if (serviceClass == this.getClass()) {
-                            continue;
-                        }
+                // // from https://github.com/intercom/intercom-cordova/pull/166/files
+                // List<ResolveInfo> services = getPackageManager().queryIntentServices(passThroughIntent, 0);
+                // for(ResolveInfo info : services) {
+                //     try {
+                //         Class serviceClass = Class.forName(info.serviceInfo.name);
+                //         if (serviceClass == this.getClass()) {
+                //             continue;
+                //         }
 
-                        Context applicationContext = getApplicationContext();
-                        passThroughIntent.setClass(applicationContext, serviceClass);
-                        applicationContext.startService(passThroughIntent);
-                        return;
-                    } catch (ClassNotFoundException e) {
-                        // Class not found. Try the next service
-                    }
-                }
+                //         Context applicationContext = getApplicationContext();
+                //         passThroughIntent.setClass(applicationContext, serviceClass);
+                //         applicationContext.startService(passThroughIntent);
+                //         return;
+                //     } catch (ClassNotFoundException e) {
+                //         // Class not found. Try the next service
+                //     }
+                // }
             }
         });
     }
