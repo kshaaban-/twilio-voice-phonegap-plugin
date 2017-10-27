@@ -17,8 +17,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import com.twilio.voice.CallInvite;
-import com.google.firebase.messaging.FirebaseMessagingService;
-import com.google.firebase.messaging.RemoteMessage;
 
 
 import com.google.android.gms.gcm.GcmListenerService;
@@ -60,49 +58,63 @@ public class VoiceGCMListenerService extends GcmListenerService {
         Log.d(TAG, "From: " + from);
         Log.d(TAG, "Bundle data: " + bundle.toString());
 
-        if (bundle.toString()) {
+        // if (CallInvite.isValidMessage(bundle)) {
             /*
              * Generate a unique notification id using the system time
              */
-            int notificationId = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
-            /*
-             * Create an CallInvite from the bundle
-             */
-            CallInvite callInvite = CallInvite.create(bundle);
-            if (callInvite != null) {
-                sendCallInviteToPlugin(callInvite, notificationId);
-                showNotification(callInvite, notificationId);
-            } else {
-                Log.e(TAG, "Error: CallInvite was not able to be created from Bundle");
+        //     int notificationId = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
+        //     /*
+        //      * Create an CallInvite from the bundle
+        //      */
+        //     CallInvite callInvite = CallInvite.create(bundle);
+        //     if (callInvite != null) {
+        //         sendCallInviteToPlugin(callInvite, notificationId);
+        //         showNotification(callInvite, notificationId);
+        //     } else {
+        //         Log.e(TAG, "Error: CallInvite was not able to be created from Bundle");
+        //     }
+        // } else {
+
+        final int notificationId = (int) System.currentTimeMillis();
+        Voice.handleMessage(this, bundle, new MessageListener() {
+        
+            @Override
+            public void onCallInvite(CallInvite callInvite) {
+                VoiceFirebaseMessagingService.this.notify(callInvite, notificationId);
+                VoiceFirebaseMessagingService.this.sendCallInviteToActivity(callInvite, notificationId);
             }
-        } else {
-            Log.d(TAG, "Invalid CallInvite Message");
 
-            // from http://stackoverflow.com/a/32066691
-            Intent passThroughIntent = new Intent();
-            bundle.putString("from", from);
-            passThroughIntent.putExtras(bundle);
-            passThroughIntent.setAction("com.google.android.c2dm.intent.RECEIVE");
-            passThroughIntent.setComponent(null);
+            @Override
+            public void onError(MessageException messageException) {
+                Log.e(TAG, messageException.getLocalizedMessage());
+                Log.d(TAG, "Invalid CallInvite Message");
 
-            // from https://github.com/intercom/intercom-cordova/pull/166/files
-            List<ResolveInfo> services = getPackageManager().queryIntentServices(passThroughIntent, 0);
-            for(ResolveInfo info : services) {
-                try {
-                    Class serviceClass = Class.forName(info.serviceInfo.name);
-                    if (serviceClass == this.getClass()) {
-                        continue;
+                // from http://stackoverflow.com/a/32066691
+                Intent passThroughIntent = new Intent();
+                bundle.putString("from", from);
+                passThroughIntent.putExtras(bundle);
+                passThroughIntent.setAction("com.google.android.c2dm.intent.RECEIVE");
+                passThroughIntent.setComponent(null);
+
+                // from https://github.com/intercom/intercom-cordova/pull/166/files
+                List<ResolveInfo> services = getPackageManager().queryIntentServices(passThroughIntent, 0);
+                for(ResolveInfo info : services) {
+                    try {
+                        Class serviceClass = Class.forName(info.serviceInfo.name);
+                        if (serviceClass == this.getClass()) {
+                            continue;
+                        }
+
+                        Context applicationContext = getApplicationContext();
+                        passThroughIntent.setClass(applicationContext, serviceClass);
+                        applicationContext.startService(passThroughIntent);
+                        return;
+                    } catch (ClassNotFoundException e) {
+                        // Class not found. Try the next service
                     }
-
-                    Context applicationContext = getApplicationContext();
-                    passThroughIntent.setClass(applicationContext, serviceClass);
-                    applicationContext.startService(passThroughIntent);
-                    return;
-                } catch (ClassNotFoundException e) {
-                    // Class not found. Try the next service
                 }
             }
-        }
+        });
     }
 
     /*
