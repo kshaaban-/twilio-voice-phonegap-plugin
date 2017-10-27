@@ -70,7 +70,7 @@ public class VoiceGCMListenerService extends GcmListenerService {
                 public void onError(MessageException messageException) {
                     Log.e(TAG, messageException.getLocalizedMessage());
                 }
-            })
+            });
 
         } else {
             Log.d(TAG, "Invalid CallInvite Message");
