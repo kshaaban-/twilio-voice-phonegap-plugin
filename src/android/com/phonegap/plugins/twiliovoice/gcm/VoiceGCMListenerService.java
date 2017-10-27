@@ -17,6 +17,9 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import com.twilio.voice.CallInvite;
+import com.google.firebase.messaging.FirebaseMessagingService;
+import com.google.firebase.messaging.RemoteMessage;
+
 
 import com.google.android.gms.gcm.GcmListenerService;
 
@@ -50,28 +53,25 @@ public class VoiceGCMListenerService extends GcmListenerService {
     }
 
     @Override
-    public void onMessageReceived(String from, Bundle bundle) {
-        Log.d(TAG, "onMessageReceived " + from);
+    public void onMessageReceived(RemoteMessage remoteMessage) {
 
-        Log.d(TAG, "Received onMessageReceived()");
-        Log.d(TAG, "From: " + from);
-        Log.d(TAG, "Bundle data: " + bundle.toString());
+        // Check if message contains a data payload.
+        if (remoteMessage.getData().size() > 0) {
+            Map<String, String> data = remoteMessage.getData();
+            final int notificationId = (int) System.currentTimeMillis();
+            Voice.handleMessage(this, data, new MessageListener() {
+                @Override
+                public void onCallInvite(CallInvite callInvite) {
+                    sendCallInviteToPlugin(callInvite, notificationId);
+                    showNotification(callInvite, notificationId);
+                }
 
-        if (CallInvite.isValidMessage(bundle)) {
-            /*
-             * Generate a unique notification id using the system time
-             */
-            int notificationId = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
-            /*
-             * Create an CallInvite from the bundle
-             */
-            CallInvite callInvite = CallInvite.create(bundle);
-            if (callInvite != null) {
-                sendCallInviteToPlugin(callInvite, notificationId);
-                showNotification(callInvite, notificationId);
-            } else {
-                Log.e(TAG, "Error: CallInvite was not able to be created from Bundle");
-            }
+                @Override
+                public void onError(MessageException messageException) {
+                    Log.e(TAG, messageException.getLocalizedMessage());
+                }
+            })
+
         } else {
             Log.d(TAG, "Invalid CallInvite Message");
 
