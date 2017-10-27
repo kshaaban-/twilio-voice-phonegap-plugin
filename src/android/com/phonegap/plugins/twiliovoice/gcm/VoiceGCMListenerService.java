@@ -17,8 +17,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import com.twilio.voice.CallInvite;
-import com.twilio.voice.MessageListener;
-import com.twilio.voice.Voice;
 
 import com.google.android.gms.gcm.GcmListenerService;
 
@@ -59,7 +57,7 @@ public class VoiceGCMListenerService extends GcmListenerService {
         Log.d(TAG, "From: " + from);
         Log.d(TAG, "Bundle data: " + bundle.toString());
 
-        if (bundle.getData().size > 0) {
+        if (CallInvite.isValidMessage(bundle)) {
             /*
              * Generate a unique notification id using the system time
              */
@@ -67,20 +65,13 @@ public class VoiceGCMListenerService extends GcmListenerService {
             /*
              * Create an CallInvite from the bundle
              */
-
-            Voice.handleMessage(this, data, new MessageListener() {
-                @Override
-                public void onCallInvite(CallInvite callInvite) {
-                    sendCallInviteToPlugin(callInvite, notificationId);
-                    showNotification(callInvite, notificationId);
-                }
-
-                @Override
-                public void onError(MessageException messageException) {
-                    Log.e(TAG, messageException.getLocalizedMessage());
-                    Log.e(TAG, "Error: CallInvite was not able to be created from Bundle");
-                }
-            });
+            CallInvite callInvite = CallInvite.create(bundle);
+            if (callInvite != null) {
+                sendCallInviteToPlugin(callInvite, notificationId);
+                showNotification(callInvite, notificationId);
+            } else {
+                Log.e(TAG, "Error: CallInvite was not able to be created from Bundle");
+            }
         } else {
             Log.d(TAG, "Invalid CallInvite Message");
 
