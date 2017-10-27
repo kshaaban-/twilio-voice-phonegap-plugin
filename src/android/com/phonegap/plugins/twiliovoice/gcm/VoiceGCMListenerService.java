@@ -71,8 +71,6 @@ public class VoiceGCMListenerService extends GcmListenerService {
         //      */
         //     CallInvite callInvite = CallInvite.create(bundle);
         //     if (callInvite != null) {
-        //         sendCallInviteToPlugin(callInvite, notificationId);
-        //         showNotification(callInvite, notificationId);
         //     } else {
         //         Log.e(TAG, "Error: CallInvite was not able to be created from Bundle");
         //     }
@@ -83,8 +81,8 @@ public class VoiceGCMListenerService extends GcmListenerService {
         
             @Override
             public void onCallInvite(CallInvite callInvite) {
-                VoiceFirebaseMessagingService.this.notify(callInvite, notificationId);
-                VoiceFirebaseMessagingService.this.sendCallInviteToActivity(callInvite, notificationId);
+                sendCallInviteToPlugin(callInvite, notificationId);
+                showNotification(callInvite, notificationId);
             }
 
             @Override
