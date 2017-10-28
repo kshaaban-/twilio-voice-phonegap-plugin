@@ -189,12 +189,12 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 			}
 
 			if(NoiseSupressor.isAvailable()) {
-				AlertDialog dialog = new AlertDialog(this);
+				AlertDialog dialog = new AlertDialog(callbackContext);
 				dialog.show();
 			}
 
 			if(AcousticEchoCanceler.isAvailable()) {
-				AlertDialog dialog = new AlertDialog(this);
+				AlertDialog dialog = new AlertDialog(callbackContext);
 				dialog.show();
 			}
 
