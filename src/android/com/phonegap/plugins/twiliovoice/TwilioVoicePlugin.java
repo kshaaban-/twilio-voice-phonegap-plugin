@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.Build;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
+
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.app.NotificationCompat;
@@ -140,6 +141,17 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 
         // initialize sound SoundPoolManager
         SoundPoolManager.getInstance(cordova.getActivity());
+
+		/*
+         * Needed for setting/abandoning audio focus during a call
+         */
+        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+        /*
+         * Enable changing the volume using the up/down keys during a conversation
+         */
+        setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+
 
 		// Handle an incoming call intent if launched from a notification
 		Intent intent = cordova.getActivity().getIntent();

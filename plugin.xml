@@ -94,7 +94,7 @@
         </config-file>
 
         <framework src="com.google.android.gms:play-services-gcm:9.4.0" />
-        <framework src="com.twilio:voice-android:2.0.0-beta23"/>
+        <framework src="com.twilio:voice-android:2.0.0-beta22"/>
 
         <source-file src="src/android/com/phonegap/plugins/twiliovoice/TwilioVoicePlugin.java"
                 target-dir="src/com/phonegap/plugins/twiliovoice" />
