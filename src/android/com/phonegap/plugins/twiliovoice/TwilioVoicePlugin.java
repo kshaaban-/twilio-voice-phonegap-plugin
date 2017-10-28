@@ -15,6 +15,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.media.audiofx.AudioEffect;
+import JOptionPane.showMessageDialog;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -188,13 +189,11 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 			}
 
 			if(NoiseSupressor.isAvailable()) {
-				Dialog dialog = new Dialog(contex);
-				dialog.show();
+				showMessageDialog(null, "NoiseSupressor");
 			}
 
 			if(AcousticEchoCanceler.isAvailable()) {
-				Dialog dialog = new Dialog(contex);
-				dialog.show();
+				showMessageDialog(null, "AcousticNoiseCanceler");
 			}
 
 			if (mIncomingCallIntent != null) {
