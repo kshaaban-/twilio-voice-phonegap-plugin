@@ -177,8 +177,6 @@ public class TwilioVoicePlugin extends CordovaPlugin {
             intentFilter.addAction(ACTION_INCOMING_CALL);
             LocalBroadcastManager lbm = LocalBroadcastManager.getInstance(cordova.getActivity());
             lbm.registerReceiver(mBroadcastReceiver, intentFilter);
-			AudioEffect.NoiseSupressor
-
 
 			if(cordova.hasPermission(RECORD_AUDIO))
 			{
@@ -194,7 +192,7 @@ public class TwilioVoicePlugin extends CordovaPlugin {
                 WebRtcAudioUtils.useWebRtcBasedAcousticEchoCanceler();
             }
 
-			if() {
+			if(NoiseSupressor.isAvailable() === true) {
 				new AlertDialog.Builder(this)
 				.setTitle("NOISE SUPRESSOR")
 				.setMessage("THIS IS AVAILABLE")
@@ -206,7 +204,7 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 				}).setNegativeButton("No", null).show();
 			}
 
-			if(AudioEffect AcousticEchoCanceler.isAvailable()) {
+			if(AcousticEchoCanceler.isAvailable() === true) {
 				new AlertDialog.Builder(this)
 				.setTitle("ACOUSTIC ECHO CANCELER")
 				.setMessage("THIS IS AVAILABLE")
