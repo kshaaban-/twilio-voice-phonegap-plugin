@@ -187,12 +187,12 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 				cordova.requestPermission(this, RECORD_AUDIO_REQ_CODE, RECORD_AUDIO);
 			}
 
-			if (AcousticEchoCanceler.isAvailable() && WebRtcAudioUtils.isAcousticEchoCancelerSupported()) {
-                WebRtcAudioUtils.setWebRtcBasedAcousticEchoCanceler(true);
-                WebRtcAudioUtils.useWebRtcBasedAcousticEchoCanceler();
-            }
+			// if (AcousticEchoCanceler.isAvailable() && WebRtcAudioUtils.isAcousticEchoCancelerSupported()) {
+            //     WebRtcAudioUtils.setWebRtcBasedAcousticEchoCanceler(true);
+            //     WebRtcAudioUtils.useWebRtcBasedAcousticEchoCanceler();
+            // }
 
-			if(NoiseSupressor.isAvailable() === true) {
+			if(NoiseSupressor.isAvailable() == true) {
 				new AlertDialog.Builder(this)
 				.setTitle("NOISE SUPRESSOR")
 				.setMessage("THIS IS AVAILABLE")
@@ -204,7 +204,7 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 				}).setNegativeButton("No", null).show();
 			}
 
-			if(AcousticEchoCanceler.isAvailable() === true) {
+			if(AcousticEchoCanceler.isAvailable() == true) {
 				new AlertDialog.Builder(this)
 				.setTitle("ACOUSTIC ECHO CANCELER")
 				.setMessage("THIS IS AVAILABLE")
