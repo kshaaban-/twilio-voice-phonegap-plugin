@@ -142,17 +142,6 @@ public class TwilioVoicePlugin extends CordovaPlugin {
         // initialize sound SoundPoolManager
         SoundPoolManager.getInstance(cordova.getActivity());
 
-		/*
-         * Needed for setting/abandoning audio focus during a call
-         */
-        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-
-        /*
-         * Enable changing the volume using the up/down keys during a conversation
-         */
-        setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
-
-
 		// Handle an incoming call intent if launched from a notification
 		Intent intent = cordova.getActivity().getIntent();
 		if (intent.getAction().equals(ACTION_INCOMING_CALL)) {

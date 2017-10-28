@@ -29,6 +29,7 @@ public class SoundPoolManager {
     private SoundPoolManager(Context context) {
 
         // AudioManager audio settings for adjusting the volume
+        context.setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
         audioManager = (AudioManager) context.getSystemService(AUDIO_SERVICE);
         actualVolume = (float) audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         maxVolume = (float) audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
