@@ -17,9 +17,6 @@ import android.os.Bundle;
 import android.os.Build;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.app.NotificationCompat;
@@ -106,6 +103,9 @@ public class TwilioVoicePlugin extends CordovaPlugin {
     public static final String ACTION_INCOMING_CALL = "INCOMING_CALL";
 
     public static final String KEY_GCM_TOKEN = "GCM_TOKEN";
+
+	private AudioManager audioManager;
+    private int savedAudioMode = AudioManager.MODE_INVALID;
 
 
 	private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
