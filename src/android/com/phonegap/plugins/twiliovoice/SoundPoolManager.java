@@ -33,8 +33,16 @@ public class SoundPoolManager {
         maxVolume = (float) audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         volume = actualVolume / maxVolume;
 
-        // Load the sounds
-        soundPool = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
+       // Load the sounds
+        int maxStreams = 1;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            soundPool = new SoundPool.Builder()
+                    .setMaxStreams(maxStreams)
+                    .build();
+        } else {
+            soundPool = new SoundPool(maxStreams, AudioManager.STREAM_MUSIC, 0);
+        }
+
         soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
             @Override
             public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
@@ -42,10 +50,8 @@ public class SoundPoolManager {
             }
 
         });
-
-        int ringingResourceId =  context.getResources().getIdentifier("ringing", "raw", context.getPackageName());
-        ringingSoundId = soundPool.load(context, ringingResourceId, 1);
-        //disconnectSoundId = soundPool.load(context, R.raw.disconnect, 1);
+        ringingSoundId = soundPool.load(context, R.raw.incoming, 1);
+        disconnectSoundId = soundPool.load(context, R.raw.disconnect, 1);
     }
 
     public static SoundPoolManager getInstance(Context context) {
@@ -56,7 +62,7 @@ public class SoundPoolManager {
     }
 
     public void playRinging() {
-        if (loaded && !playing && soundPool != null) {
+        if (loaded && !playing) {
             ringingStreamId = soundPool.play(ringingSoundId, volume, volume, 1, -1, 1f);
             playing = true;
         }
@@ -68,21 +74,22 @@ public class SoundPoolManager {
             playing = false;
         }
     }
-/*
+
     public void playDisconnect() {
         if (loaded && !playing) {
             soundPool.play(disconnectSoundId, volume, volume, 1, 0, 1f);
             playing = false;
         }
-    }*/
+    }
 
     public void release() {
         if (soundPool != null) {
             soundPool.unload(ringingSoundId);
-            //soundPool.unload(disconnectSoundId);
+            soundPool.unload(disconnectSoundId);
             soundPool.release();
             soundPool = null;
         }
+        instance = null;
     }
 
     public boolean isRinging() {
