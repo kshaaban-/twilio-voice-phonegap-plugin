@@ -16,6 +16,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.media.audiofx.AudioEffect;
 import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -167,6 +169,7 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 			final CallbackContext callbackContext) throws JSONException {
 		if ("initializeWithAccessToken".equals(action)) {
             Log.d(TAG, "Initializing with Access Token");
+			final Context context = this;
 
 			mAccessToken = args.optString(0);
 
@@ -192,8 +195,8 @@ public class TwilioVoicePlugin extends CordovaPlugin {
             //     WebRtcAudioUtils.useWebRtcBasedAcousticEchoCanceler();
             // }
 
-			if(NoiseSupressor.isAvailable() == true) {
-				new AlertDialog.Builder(this)
+			if(NoiseSuppressor.isAvailable() == true) {
+				new AlertDialog.Builder(context)
 				.setTitle("NOISE SUPRESSOR")
 				.setMessage("THIS IS AVAILABLE")
 				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -205,7 +208,7 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 			}
 
 			if(AcousticEchoCanceler.isAvailable() == true) {
-				new AlertDialog.Builder(this)
+				new AlertDialog.Builder(context)
 				.setTitle("ACOUSTIC ECHO CANCELER")
 				.setMessage("THIS IS AVAILABLE")
 				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
