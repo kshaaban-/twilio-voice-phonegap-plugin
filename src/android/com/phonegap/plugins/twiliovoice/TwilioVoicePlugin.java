@@ -14,8 +14,6 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.media.audiofx.NoiseSuppressor;
-import android.media.audiofx.AcousticEchoCanceler;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -230,10 +228,6 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 			return true;
 
 		} else if ("call".equals(action)) {
-			if (AcousticEchoCanceler.isAvailable() && WebRtcAudioUtils.isAcousticEchoCancelerSupported()) {
-                WebRtcAudioUtils.setWebRtcBasedAcousticEchoCanceler(true);
-                WebRtcAudioUtils.useWebRtcBasedAcousticEchoCanceler();
-            }
 			call(args, callbackContext);
 			return true;
 		} else if ("acceptCallInvite".equals(action)) {
