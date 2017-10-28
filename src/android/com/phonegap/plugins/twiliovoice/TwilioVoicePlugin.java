@@ -194,8 +194,8 @@ public class TwilioVoicePlugin extends CordovaPlugin {
             //     WebRtcAudioUtils.setWebRtcBasedAcousticEchoCanceler(true);
             //     WebRtcAudioUtils.useWebRtcBasedAcousticEchoCanceler();
             // }
-
-			if(NoiseSuppressor.isAvailable() == true) {
+			NoiseSuppressor noiseSupressor = new NoiseSuppressor;
+			if(noiseSuppressor.isAvailable() == true) {
 				new AlertDialog.Builder(context)
 				.setTitle("NOISE SUPRESSOR")
 				.setMessage("THIS IS AVAILABLE")
