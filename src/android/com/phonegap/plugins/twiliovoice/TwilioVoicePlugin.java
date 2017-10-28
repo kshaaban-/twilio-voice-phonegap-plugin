@@ -188,7 +188,7 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 				cordova.requestPermission(this, RECORD_AUDIO_REQ_CODE, RECORD_AUDIO);
 			}
 
-			if(NoiseSupressor.isAvailable()) {
+			if(AudioEffect NoiseSupressor.isAvailable()) {
 				new AlertDialog.Builder(this)
 				.setTitle("NOISE SUPRESSOR")
 				.setMessage("THIS IS AVAILABLE")
@@ -200,7 +200,7 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 				}).setNegativeButton("No", null).show();
 			}
 
-			if(AcousticEchoCanceler.isAvailable()) {
+			if(AudioEffect AcousticEchoCanceler.isAvailable()) {
 				new AlertDialog.Builder(this)
 				.setTitle("ACOUSTIC ECHO CANCELER")
 				.setMessage("THIS IS AVAILABLE")
