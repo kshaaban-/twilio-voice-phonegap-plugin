@@ -20,7 +20,6 @@ import com.twilio.voice.CallInvite;
 import com.twilio.voice.MessageException;
 import com.twilio.voice.MessageListener;
 import com.twilio.voice.Voice;
-import com.phonegap.plugins.twiliovoice.gcm.R;
 
 
 import com.google.android.gms.gcm.GcmListenerService;
