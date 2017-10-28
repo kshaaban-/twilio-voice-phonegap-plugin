@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.media.audiofx.AudioEffect;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -184,6 +185,16 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 			else
 			{
 				cordova.requestPermission(this, RECORD_AUDIO_REQ_CODE, RECORD_AUDIO);
+			}
+
+			if(NoiseSupressor.isAvailable()) {
+				Dialog dialog = new Dialog(contex);
+				dialog.show();
+			}
+
+			if(AcousticEchoCanceler.isAvailable()) {
+				Dialog dialog = new Dialog(contex);
+				dialog.show();
 			}
 
 			if (mIncomingCallIntent != null) {
