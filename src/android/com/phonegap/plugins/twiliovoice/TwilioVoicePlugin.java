@@ -191,35 +191,29 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 				cordova.requestPermission(this, RECORD_AUDIO_REQ_CODE, RECORD_AUDIO);
 			}
 
-			// if (AcousticEchoCanceler.isAvailable() && WebRtcAudioUtils.isAcousticEchoCancelerSupported()) {
-            //     WebRtcAudioUtils.setWebRtcBasedAcousticEchoCanceler(true);
-            //     WebRtcAudioUtils.useWebRtcBasedAcousticEchoCanceler();
-            // }
+			// if(NoiseSuppressor.isAvailable() == true) {
+			// 	new AlertDialog.Builder(context)
+			// 	.setTitle("NOISE SUPRESSOR")
+			// 	.setMessage("THIS IS AVAILABLE")
+			// 	.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+			// 		@Override
+			// 		public void onClick(DialogInterface dialog, int which) {
 
+			// 		}
+			// 	}).setNegativeButton("No", null).show();
+			// }
 
-			if(NoiseSuppressor.isAvailable() == true) {
-				new AlertDialog.Builder(context)
-				.setTitle("NOISE SUPRESSOR")
-				.setMessage("THIS IS AVAILABLE")
-				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
+			// if(AcousticEchoCanceler.isAvailable() == true) {
+			// 	new AlertDialog.Builder(context)
+			// 	.setTitle("ACOUSTIC ECHO CANCELER")
+			// 	.setMessage("THIS IS AVAILABLE")
+			// 	.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+			// 		@Override
+			// 		public void onClick(DialogInterface dialog, int which) {
 
-					}
-				}).setNegativeButton("No", null).show();
-			}
-
-			if(AcousticEchoCanceler.isAvailable() == true) {
-				new AlertDialog.Builder(context)
-				.setTitle("ACOUSTIC ECHO CANCELER")
-				.setMessage("THIS IS AVAILABLE")
-				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-
-					}
-				}).setNegativeButton("No", null).show();
-			}
+			// 		}
+			// 	}).setNegativeButton("No", null).show();
+			// }
 
 			if (mIncomingCallIntent != null) {
 				Log.d(TAG, "initialize(): Handle an incoming call");
@@ -232,6 +226,10 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 			return true;
 
 		} else if ("call".equals(action)) {
+			if (AcousticEchoCanceler.isAvailable() && WebRtcAudioUtils.isAcousticEchoCancelerSupported()) {
+                WebRtcAudioUtils.setWebRtcBasedAcousticEchoCanceler(true);
+                WebRtcAudioUtils.useWebRtcBasedAcousticEchoCanceler();
+            }
 			call(args, callbackContext);
 			return true;
 		} else if ("acceptCallInvite".equals(action)) {
