@@ -41,6 +41,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.webrtc.Logging;
+import org.webrtc.PeerConnectionFactory;
+import org.webrtc.voiceengine.WebRtcAudioManager;
+import org.webrtc.voiceengine.WebRtcAudioUtils;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -60,8 +63,6 @@ import java.util.Map;
 public class TwilioVoicePlugin extends CordovaPlugin {
 
 	public final static String TAG = "TwilioVoicePlugin";
-
-	private static final String TAG = "WebRtcAudioUtils";
 
 	private CallbackContext mInitCallbackContext;
 	private JSONArray mInitDeviceSetupArgs;
