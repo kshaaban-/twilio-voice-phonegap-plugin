@@ -15,6 +15,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.media.audiofx.AudioEffect;
+import android.app.AlertDialog;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -192,7 +193,7 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 			}
 
 			if(AcousticEchoCanceler.isAvailable()) {
-				JOptionPane.showMessageDialog(null, "AEC");
+				new AlertDialog.Builder(this).setTitle("Argh").setMessage("Watch out!").setNeutralButton("Close", null).show();
 			}
 
 			if (mIncomingCallIntent != null) {
