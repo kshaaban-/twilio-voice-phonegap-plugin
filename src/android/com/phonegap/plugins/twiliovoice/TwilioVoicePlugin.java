@@ -189,10 +189,15 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 			}
 
 			if(NoiseSupressor.isAvailable()) {
-				AlertDialog dialog = new AlertDialog(context);
-				dialog.setMessage("NS");
-				AlertDialog dialog2 = dialog.create();
-				dialog2.show();
+				new AlertDialog.Builder(this)
+				.setTitle("Closing application")
+				.setMessage("Are you sure you want to exit?")
+				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+
+					}
+				}).setNegativeButton("No", null).show();
 			}
 
 			if(AcousticEchoCanceler.isAvailable()) {
