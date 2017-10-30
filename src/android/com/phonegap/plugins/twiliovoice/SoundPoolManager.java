@@ -4,13 +4,9 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Build;
+import android.util.Log;
 
 import static android.content.Context.AUDIO_SERVICE;
-
-/**
- * From Twilio
- * https://github.com/twilio/voice-quickstart-android/blob/master/app/src/main/java/com/twilio/voice/quickstart/SoundPoolManager.java
- */
 
 public class SoundPoolManager {
 
@@ -27,21 +23,22 @@ public class SoundPoolManager {
     private static SoundPoolManager instance;
 
     private SoundPoolManager(Context context) {
-
         // AudioManager audio settings for adjusting the volume
-        // setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+        Log.d(TAG, "Creating SoundPoolManager()");
         audioManager = (AudioManager) context.getSystemService(AUDIO_SERVICE);
         actualVolume = (float) audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         maxVolume = (float) audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         volume = actualVolume / maxVolume;
 
-       // Load the sounds
+        // Load the sounds
         int maxStreams = 1;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Log.d(TAG, "getInstance() of SoundPoolManager");
             soundPool = new SoundPool.Builder()
                     .setMaxStreams(maxStreams)
                     .build();
         } else {
+            Log.d(TAG, "SoundPoolManager --> Creating new SoundPool");
             soundPool = new SoundPool(maxStreams, AudioManager.STREAM_MUSIC, 0);
         }
 
@@ -52,12 +49,14 @@ public class SoundPoolManager {
             }
 
         });
-        // ringingSoundId = soundPool.load(context, 1);
-        // disconnectSoundId = soundPool.load(context, 1);
+        ringingSoundId = soundPool.load(context, R.raw.incoming, 1);
+        disconnectSoundId = soundPool.load(context, R.raw.disconnect, 1);
     }
 
     public static SoundPoolManager getInstance(Context context) {
+        Log.d(TAG, "getInstance() of SoundPoolManager");
         if (instance == null) {
+            Log.d(TAG, "SoundPoolManager context instance == null");
             instance = new SoundPoolManager(context);
         }
         return instance;
@@ -94,7 +93,4 @@ public class SoundPoolManager {
         instance = null;
     }
 
-    public boolean isRinging() {
-        return playing;
-    }
 }
