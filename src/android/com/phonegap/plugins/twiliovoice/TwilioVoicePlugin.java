@@ -691,7 +691,17 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 	};
 
 	private void setAudioFocus(boolean setFocus) {
+		Toast.makeText(
+			webView.getContext(),
+			"HEY BABBYYYY x 3",
+			Toast.LENGTH_LONG
+		).show();
         if (audioManager != null) {
+			Toast.makeText(
+				webView.getContext(),
+				"HEY BABBYYYY x 2",
+				Toast.LENGTH_LONG
+			).show();
             if (setFocus) {
 				Toast.makeText(
 					webView.getContext(),
