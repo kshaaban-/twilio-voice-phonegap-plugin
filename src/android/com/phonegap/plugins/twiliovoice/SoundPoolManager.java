@@ -87,6 +87,10 @@ public class SoundPoolManager {
         }
     }
 
+    public boolean isRinging() {
+        return playing;
+    }
+
     public void release() {
         if (soundPool != null) {
             soundPool.unload(ringingSoundId);

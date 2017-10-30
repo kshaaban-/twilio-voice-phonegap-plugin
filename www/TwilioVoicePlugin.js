@@ -18,6 +18,14 @@
         exec(null, null, "TwilioVoicePlugin", "disconnect", null);
     }
 
+    TwilioVoiceClient.prototype.rejectCallInvite = function() {
+        exec(null, null, "TwilioVoicePlugin", "rejectCallInvite", null);
+    }
+
+    TwilioVoiceClient.prototype.acceptCallInvite = function() {
+        exec(null, null, "TwilioVoicePlugin", "acceptCallInvite", null);
+    }
+
     TwilioVoiceClient.prototype.setSpeaker = function(mode) {
         // "on" or "off"
         exec(null, null, "TwilioVoicePlugin", "setSpeaker", [mode]);
