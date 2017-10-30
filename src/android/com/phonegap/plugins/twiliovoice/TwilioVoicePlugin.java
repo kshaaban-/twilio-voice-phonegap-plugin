@@ -53,6 +53,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import android.widget.Toast;
+
 //import android.R;
 
 /**
@@ -691,6 +693,12 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 	private void setAudioFocus(boolean setFocus) {
         if (audioManager != null) {
             if (setFocus) {
+				Toast.makeText(
+					webView.getContext(),
+					"HEY BABBYYYY",
+					Toast.LENGTH_LONG
+				).show();
+
                 savedAudioMode = audioManager.getMode();
                 // Request audio focus before making any device switch.
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
