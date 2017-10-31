@@ -377,7 +377,6 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 	}
 
 
-<<<<<<< HEAD
 	public void onRequestPermissionResult(int requestCode, String[] permissions,
 										  int[] grantResults) throws JSONException
 	{
@@ -436,8 +435,6 @@ public class TwilioVoicePlugin extends CordovaPlugin {
     }
 
 
-=======
->>>>>>> origin/feature/minimize-and-refactor
 	// Twilio Voice Registration Listener
 	private RegistrationListener mRegistrationListener = new RegistrationListener() {
 		@Override
