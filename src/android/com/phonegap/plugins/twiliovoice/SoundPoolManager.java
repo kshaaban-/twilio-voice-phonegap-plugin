@@ -22,6 +22,8 @@ public class SoundPoolManager {
     private int disconnectSoundId;
     private static SoundPoolManager instance;
 
+    public final static String TAG = "TwilioVoicePlugin";
+
     private SoundPoolManager(Context context) {
         // AudioManager audio settings for adjusting the volume
         Log.d(TAG, "Creating SoundPoolManager()");
@@ -49,8 +51,10 @@ public class SoundPoolManager {
             }
 
         });
-        ringingSoundId = soundPool.load(context, R.raw.incoming, 1);
-        disconnectSoundId = soundPool.load(context, R.raw.disconnect, 1);
+
+        int ringingResourceId =  context.getResources().getIdentifier("ringing", "raw", context.getPackageName());
+        ringingSoundId = soundPool.load(context, ringingResourceId, 1);
+        //disconnectSoundId = soundPool.load(context, R.raw.disconnect, 1);
     }
 
     public static SoundPoolManager getInstance(Context context) {
@@ -81,6 +85,10 @@ public class SoundPoolManager {
             soundPool.play(disconnectSoundId, volume, volume, 1, 0, 1f);
             playing = false;
         }
+    }
+
+    public boolean isRinging() {
+        return playing;
     }
 
     public void release() {
