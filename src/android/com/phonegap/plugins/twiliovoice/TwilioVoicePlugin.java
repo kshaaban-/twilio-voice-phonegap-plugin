@@ -9,8 +9,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.os.Build;
+import android.os.SystemClock;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -39,8 +44,6 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-//import android.R;
 
 /**
  * Twilio Voice Plugin for Cordova/PhoneGap
@@ -76,13 +79,16 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 	// An incoming call intent to process (can be null)
 	private Intent mIncomingCallIntent;
 
+	// Audio Manager and Settings
+	private AudioManager audioManager;
+    private int savedAudioMode = AudioManager.MODE_INVALID;
+
 	// Marshmallow Permissions
 	public static final String RECORD_AUDIO = Manifest.permission.RECORD_AUDIO;
 	public static final int RECORD_AUDIO_REQ_CODE = 0;
     
     // Google Play Services Request Magic Number
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-
 
     // Constants for Intents and Broadcast Receivers
     public static final String ACTION_SET_GCM_TOKEN = "SET_GCM_TOKEN";
@@ -245,53 +251,10 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 		//Twilio.initialize(cordova.getActivity().getApplicationContext(), this);
 	}
 
-	/**
-	 * Set up the Twilio device with a capability token
-	 * 
-	 * @param arguments JSONArray with a Twilio capability token
-	 */
-	/*private void deviceSetup(JSONArray arguments,
-			final CallbackContext callbackContext) {
-		if (arguments == null || arguments.length() < 1) {
-			callbackContext.sendPluginResult(new PluginResult(
-					PluginResult.Status.ERROR));
-			return;
-		}
-        if (arguments.optString(0).equals("")) {
-			Log.d("TCPlugin","Releasing device");
-			cordova.getThreadPool().execute(new Runnable(){
-				public void run() {
-					mDevice.release();
-				}
-			});
-			javascriptCallback("onoffline", callbackContext);
-			return;
-		}
-		mDevice = Twilio.createDevice(arguments.optString(0), this);
-
-		Intent intent = new Intent(this.cordova.getActivity(), IncomingConnectionActivity.class);
-		PendingIntent pendingIntent = PendingIntent.getActivity(this.cordova.getActivity(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-		mDevice.setIncomingIntent(pendingIntent);
-		
-		
-		// delay one second to give Twilio device a change to change status (similar to iOS plugin)
-		cordova.getThreadPool().execute(new Runnable(){
-				public void run() {
-					try {
-						Thread.sleep(1000);
-						deviceStatusEvent(callbackContext);
-					} catch (InterruptedException ex) {
-						Log.e(TAG,"InterruptedException: " + ex.getMessage(),ex);
-					}
-				}
-			});
-	}*/
-
-
 	private void call(final JSONArray arguments, final CallbackContext callbackContext) {
 		cordova.getThreadPool().execute(new Runnable(){
 			public void run() {
-				String accessToken = arguments.optString(0,mAccessToken);
+				String accessToken = arguments.optString(0, mAccessToken);
 				JSONObject options = arguments.optJSONObject(1);
 				Map<String, String> map = getMap(options);
 				if (mCall != null && mCall.getState().equals(CallState.CONNECTED)) {
@@ -500,7 +463,7 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 				}
 				else {
 					Log.d(TAG, "EARPIECE");
-					m_amAudioManager.setMode(AudioManager.MODE_IN_CALL); 
+					m_amAudioManager.setMode(AudioManager.MODE_IN_COMMUNICATION); 
 					m_amAudioManager.setSpeakerphoneOn(false);
 				}
 			}
@@ -640,6 +603,7 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 	private Call.Listener mCallListener = new Call.Listener() {
 		@Override
 		public void onConnected(Call call) {
+			setAudioFocus(true);
 			mCall = call;
 
 			JSONObject callProperties = new JSONObject();
@@ -658,16 +622,55 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 
 		@Override
 		public void onDisconnected(Call call) {
+			setAudioFocus(false);
 			mCall = null;
 			javascriptCallback("oncalldiddisconnect",mInitCallbackContext);
 		}
 
 		@Override
 		public void onDisconnected(Call call, CallException exception) {
+			setAudioFocus(false);
 			mCall = null;
 			javascriptErrorback(exception.getErrorCode(), exception.getMessage(), mInitCallbackContext);
 		}
 	};
+
+	private void setAudioFocus(boolean setFocus) {
+        if (audioManager != null) {
+            if (setFocus) {
+                savedAudioMode = audioManager.getMode();
+                // Request audio focus before making any device switch.
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    AudioAttributes playbackAttributes = new AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                            .build();
+                    AudioFocusRequest focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+                            .setAudioAttributes(playbackAttributes)
+                            .setAcceptsDelayedFocusGain(true)
+                            .setOnAudioFocusChangeListener(new AudioManager.OnAudioFocusChangeListener() {
+                                @Override
+                                public void onAudioFocusChange(int i) { }
+                            })
+                            .build();
+                    audioManager.requestAudioFocus(focusRequest);
+                } else {
+                    audioManager.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL,
+                            AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+                }
+                /*
+                 * Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
+                 * required to be in this mode when playout and/or recording starts for
+                 * best possible VoIP performance. Some devices have difficulties with speaker mode
+                 * if this is not set.
+                 */
+                audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+            } else {
+                audioManager.setMode(savedAudioMode);
+                audioManager.abandonAudioFocus(null);
+            }
+        }
+    };
 
 	private String getCallState(CallState callState) {
 		if (callState == CallState.CONNECTED) {

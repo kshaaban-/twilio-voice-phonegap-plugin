@@ -3,6 +3,8 @@ package com.phonegap.plugins.twiliovoice;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.SoundPool;
+import android.os.Build;
+import android.util.Log;
 
 import static android.content.Context.AUDIO_SERVICE;
 
@@ -12,7 +14,7 @@ import static android.content.Context.AUDIO_SERVICE;
  */
 
 public class SoundPoolManager {
-
+    public final static String TAG = "TwilioVoicePlugin";
     private boolean playing = false;
     private boolean loaded = false;
     private float actualVolume;
@@ -26,15 +28,24 @@ public class SoundPoolManager {
     private static SoundPoolManager instance;
 
     private SoundPoolManager(Context context) {
-
-        // AudioManager audio settings for adjusting the volume
+        Log.d(TAG, "Creating SoundPoolManager()");
         audioManager = (AudioManager) context.getSystemService(AUDIO_SERVICE);
         actualVolume = (float) audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         maxVolume = (float) audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         volume = actualVolume / maxVolume;
 
         // Load the sounds
-        soundPool = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
+        int maxStreams = 1;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Log.d(TAG, "getInstance() of SoundPoolManager");
+            soundPool = new SoundPool.Builder()
+                    .setMaxStreams(maxStreams)
+                    .build();
+        } else {
+            Log.d(TAG, "SoundPoolManager --> Creating new SoundPool");
+            soundPool = new SoundPool(maxStreams, AudioManager.STREAM_MUSIC, 0);
+        }
+
         soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
             @Override
             public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
