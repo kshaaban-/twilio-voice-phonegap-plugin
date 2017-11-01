@@ -99,6 +99,7 @@ public class TwilioVoicePlugin extends CordovaPlugin {
     // Google Play Services Request Magic Number
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
+	// Audio Manager and Settings
 	private AudioManager audioManager;
     private int savedAudioMode = AudioManager.MODE_INVALID;
 
@@ -130,7 +131,7 @@ public class TwilioVoicePlugin extends CordovaPlugin {
                 /*
                  * Handle the incoming call invite
                  */
-                // handleIncomingCallIntent(intent);
+                handleIncomingCallIntent(intent);
             }
 		}
 	};
@@ -193,12 +194,10 @@ public class TwilioVoicePlugin extends CordovaPlugin {
             lbm.registerReceiver(mBroadcastReceiver, intentFilter);
 
 
-			if(cordova.hasPermission(RECORD_AUDIO))
-			{
+			if(cordova.hasPermission(RECORD_AUDIO)) {
 				startGCMRegistration();
 			}
-			else
-			{
+			else {
 				cordova.requestPermission(this, RECORD_AUDIO_REQ_CODE, RECORD_AUDIO);
 			}
 
@@ -568,7 +567,8 @@ public class TwilioVoicePlugin extends CordovaPlugin {
         if (intent != null && intent.getAction() != null && intent.getAction().equals(ACTION_INCOMING_CALL)) {
             mCallInvite = intent.getParcelableExtra(INCOMING_CALL_INVITE);
             Log.d(TAG, "Call Invite: " + mCallInvite.toString());
-            if (mCallInvite != null && (mCallInvite.getState() == CallInvite.State.PENDING)) {
+            if ((mCallInvite.getState() != CallInvite.State.CANCELED)) {
+				Log.d(TAG, "INSIDE CALL INVITE STATEMENT LOOK IN HERE");
                 SoundPoolManager.getInstance(cordova.getActivity()).playRinging();
                 NotificationManager mNotifyMgr = 
 		        (NotificationManager) cordova.getActivity().getSystemService(Activity.NOTIFICATION_SERVICE);
@@ -586,6 +586,7 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 				Log.d(TAG,"oncallinvitereceived");
                 javascriptCallback("oncallinvitereceived", callInviteProperties, mInitCallbackContext); 
             } else {
+				Log.d(TAG, "OUTSIDEEEEE CALL INVITE STATEMENT LOOK IN HERE");
                 SoundPoolManager.getInstance(cordova.getActivity()).stopRinging();
 				Log.d(TAG,"oncallinvitecanceled");
                 javascriptCallback("oncallinvitecanceled",mInitCallbackContext); 
@@ -625,7 +626,7 @@ public class TwilioVoicePlugin extends CordovaPlugin {
 			try {
 				callProperties.putOpt("from", call.getFrom());
 				callProperties.putOpt("to", call.getTo());
-				// callProperties.putOpt("callSid", call.getCallSid());
+				callProperties.putOpt("callSid", call.getSid());
 				callProperties.putOpt("isMuted", call.isMuted());
 				String callState = getCallState(call.getState());
 				callProperties.putOpt("state",callState);
