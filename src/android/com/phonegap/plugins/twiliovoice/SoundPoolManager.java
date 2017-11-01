@@ -67,7 +67,7 @@ public class SoundPoolManager {
     }
 
     public void playRinging() {
-        if (loaded && !playing) {
+        if (loaded && !playing && soundPool != null) {
             ringingStreamId = soundPool.play(ringingSoundId, volume, volume, 1, -1, 1f);
             playing = true;
         }
@@ -94,11 +94,11 @@ public class SoundPoolManager {
     public void release() {
         if (soundPool != null) {
             soundPool.unload(ringingSoundId);
-            soundPool.unload(disconnectSoundId);
+            // soundPool.unload(disconnectSoundId);
             soundPool.release();
             soundPool = null;
         }
-        instance = null;
+        // instance = null;
     }
 
 }
