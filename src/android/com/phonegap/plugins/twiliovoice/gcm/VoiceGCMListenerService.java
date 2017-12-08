@@ -156,7 +156,7 @@ public class VoiceGCMListenerService extends GcmListenerService {
                     new NotificationCompat.Builder(this)
                             .setSmallIcon(iconIdentifier)
                             .setContentTitle(contentTitle)
-                            .setContentText("Call Invite from : ", + from)
+                            .setContentText("Call Invite from : " + from)
                             .setAutoCancel(true)
                             .setSound(Uri.parse("android.resource://"
                                 + getPackageName() + "/" + ringingResourceId))
