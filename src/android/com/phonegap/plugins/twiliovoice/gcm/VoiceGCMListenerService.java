@@ -156,13 +156,15 @@ public class VoiceGCMListenerService extends GcmListenerService {
                     new NotificationCompat.Builder(this)
                             .setSmallIcon(iconIdentifier)
                             .setContentTitle(contentTitle)
-                            .setContentText(from)
+                            .setContentText("Call Invite from : ", + from)
                             .setAutoCancel(true)
                             .setSound(Uri.parse("android.resource://"
                                 + getPackageName() + "/" + ringingResourceId))
                             .setExtras(extras)
                             .setContentIntent(pendingIntent)
                             .setGroup("voice_app_notification")
+                            .setPriority(2)
+                            .setVisibility(1)
                             .setColor(Color.rgb(225, 225, 225));
 
             Log.d(TAG, "showNotification(): building notification");
