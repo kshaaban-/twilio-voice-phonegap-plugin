@@ -16,6 +16,8 @@ import android.service.notification.StatusBarNotification;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+
+import com.ignitras.loudcloud.R;
 import com.twilio.voice.CallInvite;
 
 import com.google.android.gms.gcm.GcmListenerService;
@@ -25,6 +27,9 @@ import com.phonegap.plugins.twiliovoice.TwilioVoicePlugin;
 import java.util.List;
 
 import static android.R.attr.data;
+import static android.R.attr.icon;
+import static android.R.attr.mipMap;
+import static android.R.attr.resource;
 
 /*
  * Based on https://github.com/twilio/voice-quickstart-android/blob/master/app/src/main/java/com/twilio/voice/quickstart/gcm/VoiceGCMListenerService.java
