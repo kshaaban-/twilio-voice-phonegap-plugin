@@ -139,7 +139,7 @@ public class VoiceGCMListenerService extends GcmListenerService {
             /*
              * Create the notification shown in the notification drawer
              */
-            int iconIdentifier = getResources().getIdentifier("icon", "mipmap", getPackageName());
+            // int iconIdentifier = getResources().getIdentifier("icon", "mipmap", getPackageName());
             int ringingResourceId =  getResources().getIdentifier("ringing", "raw", getPackageName());
             int incomingCallAppNameId = getResources().getIdentifier("incoming_call_app_name", "string", getPackageName());
             Log.d(TAG, "Incoming Call App Name Id: " + incomingCallAppNameId);
@@ -154,7 +154,7 @@ public class VoiceGCMListenerService extends GcmListenerService {
 
             NotificationCompat.Builder notificationBuilder =
                     new NotificationCompat.Builder(this)
-                            .setSmallIcon(iconIdentifier)
+                            .setSmallIcon(R.drawable.ic_notification)
                             .setContentTitle(contentTitle)
                             .setContentText("Call Invite from : " + from)
                             .setAutoCancel(true)
@@ -165,7 +165,7 @@ public class VoiceGCMListenerService extends GcmListenerService {
                             .setGroup("voice_app_notification")
                             .setPriority(2)
                             .setVisibility(1)
-                            .setColor(Color.rgb(225, 225, 225));
+                            .setColor(Color.parseColor("#CE2E42"));
 
             Log.d(TAG, "showNotification(): building notification");
 
