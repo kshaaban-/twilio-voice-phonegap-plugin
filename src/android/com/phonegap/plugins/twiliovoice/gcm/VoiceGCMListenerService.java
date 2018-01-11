@@ -159,7 +159,7 @@ public class VoiceGCMListenerService extends GcmListenerService {
 
             NotificationCompat.Builder notificationBuilder =
                     new NotificationCompat.Builder(this)
-                            .setSmallIcon(R.drawable.ic_notification)
+                            .setSmallIcon(R.drawable.ic_stat_onesignal_default)
                             .setContentTitle(contentTitle)
                             .setContentText("Call Invite from : " + from)
                             .setAutoCancel(true)
